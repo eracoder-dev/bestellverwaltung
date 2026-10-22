@@ -1,0 +1,18 @@
+.badge {
+  padding: 0.1rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+}
+.offen {
+  background: #fff3cd;
+}
+.bezahlt {
+  background: #d1e7dd;
+}
+.versandt {
+  background: #cfe2ff;
+}
+.storniert {
+  background: #e2e3e5;
+  text-decoration: line-through;
+}

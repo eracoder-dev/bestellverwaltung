@@ -1,0 +1,15 @@
+:host {
+  display: inline-block;
+  min-width: 8rem;
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+}
+.titel {
+  font-size: 0.85rem;
+  color: #666;
+}
+.wert {
+  font-size: 1.4rem;
+}

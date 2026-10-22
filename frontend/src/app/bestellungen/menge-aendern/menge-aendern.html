@@ -1,0 +1,5 @@
+<button type="button" [disabled]="gesperrt() || menge() <= 1" (click)="aendern.emit(menge() - 1)">
+  −
+</button>
+{{ menge() }}
+<button type="button" [disabled]="gesperrt()" (click)="aendern.emit(menge() + 1)">+</button>

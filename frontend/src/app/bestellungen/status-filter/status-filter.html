@@ -1,0 +1,5 @@
+@for (option of optionen; track option) {
+  <button type="button" [class.aktiv]="option === auswahl()" (click)="auswahl.set(option)">
+    {{ option }} ({{ anzahl()[option] }})
+  </button>
+}

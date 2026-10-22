@@ -1,0 +1,22 @@
+table {
+  border-collapse: collapse;
+  min-width: 28rem;
+}
+th,
+td {
+  padding: 0.3rem 0.8rem;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+.zahl {
+  text-align: right;
+}
+.storniert td {
+  color: #888;
+}
+.gross {
+  font-weight: bold;
+}
+.streifen {
+  background: #e6e8ea;
+}

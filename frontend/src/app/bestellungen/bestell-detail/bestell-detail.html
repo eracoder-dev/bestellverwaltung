@@ -1,0 +1,86 @@
+@if (bestellung(); as b) {
+  <h2>Bestellung #{{ b.id }} - {{ b.kunde }}</h2>
+  <app-status-badge [status]="b.status"></app-status-badge>
+
+  <div>
+    <button (click)="switchPos()">
+      @if (positionenSichtbar()) {
+        Positionen ausblenden
+      } @else {
+        Positionen einblenden
+      }
+    </button>
+  </div>
+  @if (positionenSichtbar()) {
+
+    <table>
+      <th>Pos.</th>
+      <th>Artikel</th>
+      <th class="zahl">Menge</th>
+      <th class="zahl">Einzelpreis</th>
+      <th class="zahl">Betrag</th>
+      @for (pos of b.positionen; track pos.artikel) {
+        <tr>
+          <td>{{ $index + 1 }}</td>
+          <td>{{ pos.artikel }}</td>
+          <td class="zahl">
+            @if (b.status === 'offen') {
+              <app-menge-aendern
+                [menge]="pos.menge"
+                [gesperrt]="speichert()"
+                (aendern)="mengeSetzen(pos.artikel, $event)"
+              />
+            } @else {
+              {{ pos.menge }}
+            }
+          </td>
+          <td class="zahl">{{ pos.einzelpreis | currency }}</td>
+          <td class="zahl">{{ (pos.menge * pos.einzelpreis) | currency }}</td>
+        </tr>
+      }
+      <tfoot>
+      <tr>
+        <td colspan="3">Summe</td>
+        <td class="zahl">{{ summe(b) | currency }}</td>
+      </tr>
+      </tfoot>
+    </table>
+  }
+
+  <h2>Status ändern</h2>
+  @if (b.status === 'storniert') {
+    <p>Stornierte Bestellungen lassen sich nicht mehr ändern.</p>
+  } @else if (stornoFragen()) {
+    <p>
+      Bestellung #{{ b.id }} wirklich stornieren?
+      <button type="button" [disabled]="speichert()" (click)="statusSetzen('storniert')">Ja</button>
+      <button type="button" [disabled]="speichert()" (click)="stornoFragen.set(false)">Nein</button>
+    </p>
+  } @else {
+    <p>
+      Status ändern:
+      @for (s of statusWerte; track s) {
+        <button type="button" [disabled]="speichert() || s === b.status" (click)="waehlen(s)">
+          {{ s }}
+        </button>
+      }
+    </p>
+  }
+
+  <p>
+    @if (vorherigeBestellung(); as vorherige) {
+      <a [routerLink]="['/bestellungen', vorherige.id]">← {{ vorherige.id }}</a>
+    }
+    @if (naechsteBestellung(); as naechste) {
+      <a [routerLink]="['/bestellungen', naechste.id]">{{ naechste.id }} →</a>
+    }
+  </p>
+
+} @else {
+  <p>Eine Bestellung mit der Nummer {{ id() }} gibt es nicht.</p>
+}
+
+<p>
+  <a routerLink="/">Zurück zur Übersicht</a>
+</p>
+
