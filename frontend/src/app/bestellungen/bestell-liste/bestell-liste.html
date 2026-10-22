@@ -1,60 +1,73 @@
-@if (bestellungen().length === gesamt()) {
-  <h2>Bestellungen ({{ gesamt() }})</h2>
+@if (fehler()) {
+  <h2>Bestellungen</h2>
+  <p class="fehler">Die Bestellungen konnten nicht geladen werden.</p>
+  <button type="button" (click)="reload()">Reload</button>
+} @else if (laedt()) {
+  <h2>Bestellungen</h2>
+  <p>Lade Bestellungen …</p>
 } @else {
-  <h2>Bestellungen ({{ bestellungen().length }} von {{ gesamt() }})</h2>
+
+  @if (bestellungen().length === gesamt()) {
+    <h2>Bestellungen ({{ gesamt() }})</h2>
+  } @else {
+    <h2>Bestellungen ({{ bestellungen().length }} von {{ gesamt() }})</h2>
+  }
+
+  <p>
+    <app-suchfeld [(text)]="suche"/>
+  </p>
+
+  <p>
+    <app-kennzahl titel="Bestellungen">{{ gesamt() }}</app-kennzahl>
+    <app-kennzahl titel="Offen">{{ anzahl().offen }}</app-kennzahl>
+    <app-kennzahl titel="Umsatz ohne Stornos">{{ umsatz() | currency }}</app-kennzahl>
+  </p>
+  <p>
+    <app-status-filter [(auswahl)]="filter" [anzahl]="anzahl()"/>
+  </p>
+
+  <p>
+    <input (change)="nachSumme.set(!nachSumme())" [checked]="nachSumme()" id="sortSum" type="checkbox" value="sort2"/>
+    <label for="sortSum">nach Summe sortieren</label>
+  </p>
+
+  <table>
+    <thead>
+    <tr>
+      <th>Nr.</th>
+      <th>Kunde</th>
+      <th>Status</th>
+      <th>Positionen</th>
+      <th class="zahl">Summe</th>
+      <th>Umsatz</th>
+    </tr>
+    </thead>
+    <tbody>
+      @for (b of bestellungen(); track b.id) {
+        <tr [class.gross]="summe(b) >= 100" [class.storniert]="b.status === 'storniert'" [class.streifen]="$odd">
+          <td><a [routerLink]="['/bestellungen', b.id]">Bestellung #{{ b.id }}</a></td>
+          <td>{{ b.kunde }}</td>
+          <td>
+            <app-status-badge [status]="b.status"/>
+          </td>
+          <td>{{ b.positionen.length | positionen }}</td>
+          <td class="zahl">{{ summe(b) | currency }}</td>
+          <td class="zahl">
+            @if (b.status === 'storniert') {
+              -
+            } @else {
+              {{ summe(b) / umsatz() | percent: '1.1-1' }}
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4">Keine Bestellungen mit diesem Status.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  <p>Umsatz ohne Stornos: <strong>{{ umsatz() | currency }}</strong></p>
+
 }
-
-<p>
-  <app-suchfeld [(text)]="suche" />
-</p>
-
-<p>
-  <app-kennzahl titel="Bestellungen">{{ gesamt() }}</app-kennzahl>
-  <app-kennzahl titel="Offen">{{ anzahl().offen }}</app-kennzahl>
-  <app-kennzahl titel="Umsatz ohne Stornos">{{ umsatz() | currency }}</app-kennzahl>
-</p>
-<p>
-  <app-status-filter [(auswahl)]="filter" [anzahl]="anzahl()" />
-</p>
-
-<p>
-  <input id="sortSum" type="checkbox" value="sort2" [checked]="nachSumme()" (change)="nachSumme.set(!nachSumme())" />
-  <label for="sortSum">nach Summe sortieren</label>
-</p>
-
-<table>
-  <thead>
-  <tr>
-    <th>Nr.</th>
-    <th>Kunde</th>
-    <th>Status</th>
-    <th>Positionen</th>
-    <th class="zahl">Summe</th>
-    <th>Umsatz</th>
-  </tr>
-  </thead>
-  <tbody>
-    @for (b of bestellungen(); track b.id) {
-      <tr [class.streifen]="$odd" [class.storniert]="b.status === 'storniert'" [class.gross]="summe(b) >= 100">
-        <td><a [routerLink]="['/bestellungen', b.id]">Bestellung #{{ b.id }}</a></td>
-        <td>{{ b.kunde }}</td>
-        <td><app-status-badge [status]="b.status" /></td>
-        <td>{{ b.positionen.length | positionen }}</td>
-        <td class="zahl">{{ summe(b) | currency }}</td>
-        <td class="zahl">
-          @if (b.status === 'storniert') {
-            -
-          } @else {
-            {{ summe(b) / umsatz() | percent: '1.1-1' }}
-          }
-        </td>
-      </tr>
-    } @empty {
-      <tr>
-        <td colspan="4">Keine Bestellungen mit diesem Status.</td>
-      </tr>
-    }
-  </tbody>
-</table>
-
-<p>Umsatz ohne Stornos: <strong>{{ umsatz() | currency }}</strong></p>

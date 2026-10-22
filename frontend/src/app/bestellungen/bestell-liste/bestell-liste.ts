@@ -57,6 +57,8 @@ export class BestellListe {
   });
   protected readonly gesamt = computed(() => this.service.alle().length);
   protected readonly umsatz = this.service.umsatz;
+  protected readonly laedt = this.service.laedt;
+  protected readonly fehler = this.service.fehler;
 
   constructor() {
     effect(() => {
@@ -76,7 +78,7 @@ export class BestellListe {
     return wert !== null && (STATUS_WERTE as readonly string[]).includes(wert);
   }
 
-  protected changeSort() {
-    this.nachSumme.set(!this.nachSumme());
+  reload() {
+    return this.service.reload();
   }
 }

@@ -31,6 +31,8 @@ export class BestellDetail {
   });
   protected naechsteBestellung = computed(() => this.service.alle().at(this.index() + 1));
 
+  protected readonly laedt = this.service.laedt;
+
   protected warte = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
   protected async statusSetzen(status: Status): Promise<void> {

@@ -1,9 +1,11 @@
-@if (bestellung(); as b) {
+@if (laedt()) {
+  <p>Lade Bestellung …</p>
+} @else if (bestellung(); as b) {
   <h2>Bestellung #{{ b.id }} - {{ b.kunde }}</h2>
   <app-status-badge [status]="b.status"></app-status-badge>
 
   <div>
-    <button (click)="switchPos()">
+    <button type="button" (click)="switchPos()">
       @if (positionenSichtbar()) {
         Positionen ausblenden
       } @else {

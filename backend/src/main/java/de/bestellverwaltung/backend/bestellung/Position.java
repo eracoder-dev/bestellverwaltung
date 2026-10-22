@@ -7,6 +7,6 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public record Position(@NotBlank(message = "Artikel fehlt") String artikel,
-                       @Min(value = 1, message = "Menge mindestens 1") BigDecimal menge,
+                       @Min(value = 1, message = "Menge mindestens 1") int menge,
                        @NotNull @Positive(message = "Preis muss größer als 0 sein") BigDecimal einzelpreis) {
 }
