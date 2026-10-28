@@ -1,15 +1,16 @@
-import {computed, Service} from '@angular/core';
+import {computed, inject, Service} from '@angular/core';
 import {Bestellung, Status} from './modell';
-import {httpResource} from '@angular/common/http';
+import {HttpClient, httpResource} from '@angular/common/http';
+import {firstValueFrom} from 'rxjs';
 
 const API = '/api/bestellungen';
-const warte = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 @Service()
 export class BestellService {
   private readonly bestellungen = httpResource<Bestellung[]>(() => API, {
     defaultValue: [],
   });
+  private readonly http = inject(HttpClient);
   readonly laedt = this.bestellungen.isLoading;
   readonly fehler = this.bestellungen.error;
   readonly alle = computed(() => this.bestellungen.hasValue() ? this.bestellungen.value() : []);
@@ -19,42 +20,29 @@ export class BestellService {
       .reduce((s, b) => s + summe(b), 0),
   );
 
-  async reload() {
+  reload() {
     this.bestellungen.reload();
   }
 
-  async mengeSetzen(id: number, artikel: string, menge: number): Promise<Bestellung> {
-    await warte(300);
-    const vorhanden = this.alle().find((b) => b.id === id);
-    if (!vorhanden) {
-      throw new Error(`Bestellung ${id} nicht gefunden`);
-    }
-    if (vorhanden.status !== 'offen') {
-      throw new Error(`Bestellung ${id} ist nicht mehr offen`);
-    }
-    if (menge < 1) {
-      throw new Error(`Menge muss größer 0 sein.`);
-    }
-    const geaendert = {
-      ...vorhanden,
-      positionen: vorhanden.positionen.map((p) => (p.artikel === artikel ? {...p, menge} : p)),
-    };
-    this.bestellungen.update((liste) => liste.map((b) => (b.id === id ? geaendert : b)));
+  async mengeSetzen(id: number, nr: number, menge: number): Promise<Bestellung> {
+
+    const geaendert = await firstValueFrom(
+      this.http.put<Bestellung>(`${API}/${id}/positionen/${nr}`, {menge})
+    );
+    this.ersetzen(geaendert);
     return geaendert;
   }
 
   async statusSetzen(id: number, status: Status): Promise<Bestellung> {
-    await warte(300);
-    const vorhanden = this.alle().find((b) => b.id === id);
-    if (!vorhanden) {
-      throw new Error(`Bestellung ${id} nicht gefunden`);
-    }
-    if (vorhanden.status === 'storniert') {
-      throw new Error(`Bestellung ${id} ist storniert`);
-    }
-    const geaendert = {...vorhanden, status};
-    this.bestellungen.update((liste) => liste.map((b) => (b.id === id ? geaendert : b)));
+    const geaendert = await firstValueFrom(
+      this.http.put<Bestellung>(`${API}/${id}/status`, {status}),
+    );
+    this.ersetzen(geaendert);
     return geaendert;
+  }
+
+  private ersetzen(geaendert: Bestellung): void {
+    this.bestellungen.update((liste) => liste.map((b) => (b.id === geaendert.id ? geaendert : b)));
   }
 }
 

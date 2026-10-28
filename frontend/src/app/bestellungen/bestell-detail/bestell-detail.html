@@ -30,7 +30,7 @@
               <app-menge-aendern
                 [menge]="pos.menge"
                 [gesperrt]="speichert()"
-                (aendern)="mengeSetzen(pos.artikel, $event)"
+                (aendern)="mengeSetzen($index + 1, $event)"
               />
             } @else {
               {{ pos.menge }}
@@ -58,6 +58,8 @@
       <button type="button" [disabled]="speichert()" (click)="statusSetzen('storniert')">Ja</button>
       <button type="button" [disabled]="speichert()" (click)="stornoFragen.set(false)">Nein</button>
     </p>
+  } @else if (fehler()) {
+    <p class="fehler">{{ fehler() }}</p>
   } @else {
     <p>
       Status ändern:

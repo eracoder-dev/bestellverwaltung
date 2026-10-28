@@ -5,6 +5,7 @@ import {StatusBadge} from '../status-badge/status-badge';
 import {CurrencyPipe} from '@angular/common';
 import {Status, STATUS_WERTE} from '../modell';
 import {MengeAendern} from '../menge-aendern/menge-aendern';
+import {fehlertext} from '../fehlertext';
 
 @Component({
   imports: [RouterLink, StatusBadge, CurrencyPipe, MengeAendern],
@@ -15,6 +16,7 @@ import {MengeAendern} from '../menge-aendern/menge-aendern';
 export class BestellDetail {
   readonly id = input.required({transform: numberAttribute});
   readonly positionenSichtbar = signal(true);
+  protected readonly fehler = signal('');
   protected speichert = signal(false);
   protected readonly stornoFragen = linkedSignal({source: this.id, computation: () => false});
   protected readonly summe = summe;
@@ -33,12 +35,14 @@ export class BestellDetail {
 
   protected readonly laedt = this.service.laedt;
 
-  protected warte = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
-
   protected async statusSetzen(status: Status): Promise<void> {
+    this.speichert.set(true);
+    this.fehler.set('');
     try {
-      this.speichert.set(true);
       await this.service.statusSetzen(this.id(), status);
+    } catch (e) {
+      this.fehler.set(fehlertext(e));
+      await this.service.reload();
     } finally {
       this.speichert.set(false);
     }
@@ -56,10 +60,13 @@ export class BestellDetail {
     this.positionenSichtbar.update((p) => !p);
   }
 
-  protected async mengeSetzen(artikel: string, menge: number): Promise<void> {
+  protected async mengeSetzen(index: number, menge: number): Promise<void> {
     this.speichert.set(true);
     try {
-      await this.service.mengeSetzen(this.id(), artikel, menge);
+      await this.service.mengeSetzen(this.id(), index, menge);
+    } catch (e) {
+      this.fehler.set(fehlertext(e));
+      this.service.reload();
     } finally {
       this.speichert.set(false);
     }

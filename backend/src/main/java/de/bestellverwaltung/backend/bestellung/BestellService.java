@@ -3,6 +3,7 @@ package de.bestellverwaltung.backend.bestellung;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -34,6 +35,21 @@ public class BestellService {
 
     public Bestellung anlegen(NeueBestellung daten) {
         return speichere(daten.kunde().strip(), Status.OFFEN, daten.positionen());
+    }
+
+    public Optional<Bestellung> mengeSetzen(long id, int nr, int menge) {
+        return finde(id).map(vorhanden -> {
+            if (vorhanden.status() != Status.OFFEN) {
+                throw new IllegalStateException("Bestellung " + id + " ist nicht mehr offen");
+            }
+            if (nr < 1 || nr > vorhanden.positionen().size()) {
+                throw new NoSuchElementException("Bestellung " + id + " hat keine Position " + nr);
+            }
+
+            Bestellung geaendert = vorhanden.mitMenge(nr, menge);
+            bestellungen.put(id, geaendert);
+            return geaendert;
+        });
     }
 
     public Optional<Bestellung> statusSetzen(long id, Status status) {
