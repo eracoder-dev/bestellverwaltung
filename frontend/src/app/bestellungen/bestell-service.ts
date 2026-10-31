@@ -1,5 +1,5 @@
 import {computed, inject, Service} from '@angular/core';
-import {Bestellung, Status} from './modell';
+import {Bestellung, NeueBestellung, Status} from './modell';
 import {HttpClient, httpResource} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
 
@@ -41,11 +41,17 @@ export class BestellService {
     return geaendert;
   }
 
+  async anlegen(daten: NeueBestellung): Promise<Bestellung> {
+    const neu = await firstValueFrom(this.http.post<Bestellung>(API, daten));
+    this.bestellungen.update((liste) => [...liste, neu]);
+    return neu;
+  }
+
   private ersetzen(geaendert: Bestellung): void {
     this.bestellungen.update((liste) => liste.map((b) => (b.id === geaendert.id ? geaendert : b)));
   }
 }
 
-export function summe(b: Bestellung): number {
+export function summe(b: Pick<Bestellung, 'positionen'>): number {
   return b.positionen.reduce((s, p) => s + p.menge * p.einzelpreis, 0);
 }
