@@ -1,4 +1,4 @@
-import {CurrencyPipe, PercentPipe} from '@angular/common';
+import {CurrencyPipe, DatePipe, PercentPipe} from '@angular/common';
 import {Component, computed, effect, inject, signal} from '@angular/core';
 import {BestellService, summe} from '../bestell-service';
 import {StatusBadge} from '../status-badge/status-badge';
@@ -19,6 +19,7 @@ import {PositionenPipe} from '../positionen-pipe';
     Suchfeld,
     PercentPipe,
     PositionenPipe,
+    DatePipe,
   ],
   selector: 'app-bestell-liste',
   styleUrl: './bestell-liste.css',

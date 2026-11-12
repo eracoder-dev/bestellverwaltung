@@ -12,6 +12,7 @@ export interface Bestellung {
   kunde: string;
   positionen: Position[];
   status: Status;
+  angelegtAm: string;
 }
 
-export type NeueBestellung = Omit<Bestellung, 'id' | 'status'>;
+export type NeueBestellung = Omit<Bestellung, 'id' | 'status' | 'angelegtAm'>;

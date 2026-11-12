@@ -36,6 +36,7 @@
     <tr>
       <th>Nr.</th>
       <th>Kunde</th>
+      <th>Angelegt</th>
       <th>Status</th>
       <th>Positionen</th>
       <th class="zahl">Summe</th>
@@ -47,6 +48,7 @@
         <tr [class.gross]="summe(b) >= 100" [class.storniert]="b.status === 'storniert'" [class.streifen]="$odd">
           <td><a [routerLink]="['/bestellungen', b.id]">Bestellung #{{ b.id }}</a></td>
           <td>{{ b.kunde }}</td>
+          <td>{{ b.angelegtAm | date: 'short' }}</td>
           <td>
             <app-status-badge [status]="b.status"/>
           </td>
@@ -62,7 +64,7 @@
         </tr>
       } @empty {
         <tr>
-          <td colspan="4">Keine Bestellungen mit diesem Status.</td>
+          <td colspan="5">Keine Bestellungen mit diesem Status.</td>
         </tr>
       }
     </tbody>

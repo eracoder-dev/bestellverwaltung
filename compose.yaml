@@ -1,0 +1,34 @@
+name: bestellverwaltung
+
+services:
+  backend:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bestellungen
+      DB_PASSWORT: ${DB_PASSWORT}
+    depends_on:
+      db:
+        condition: service_healthy
+  frontend:
+    build: ./frontend
+    ports:
+      - "8000:80"
+    depends_on:
+      - backend
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: bestellungen
+      POSTGRES_USER: bestellungen
+      POSTGRES_PASSWORD: ${DB_PASSWORT:?Bitte die Datei .env mit DB_PASSWORT anlegen}
+    ports:
+      - "5432:5432"
+    volumes:
+      - daten:/var/lib/postgresql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+      interval: 5s
+      retries: 5
+
+volumes:
+  daten:

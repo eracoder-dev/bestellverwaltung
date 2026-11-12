@@ -1,0 +1,11 @@
+td {
+  padding: 0.2rem 0.4rem 0.2rem 0;
+}
+
+input[type='number'] {
+  width: 6rem;
+}
+
+a {
+  margin-left: 1rem;
+}
