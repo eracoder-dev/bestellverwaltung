@@ -41,7 +41,7 @@ public class BestellController {
 
     @GetMapping(value = "/{id}", produces = "application/json")
     public Bestellung finde(@PathVariable long id) {
-        return service.finde(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return service.finde(id).orElseThrow(() -> nichtGefunden(id));
     }
 
     @PostMapping

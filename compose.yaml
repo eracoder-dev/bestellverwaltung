@@ -6,6 +6,10 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/bestellungen
       DB_PASSWORT: ${DB_PASSWORT}
+      JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    ports:
+      - "8080:8080"
+      - "5005:5005"
     depends_on:
       db:
         condition: service_healthy
